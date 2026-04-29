@@ -697,6 +697,102 @@ footer .brand {
   margin-top: 8px;
 }
 
+/* TOGGLE SWITCH for "no figura en BOE" */
+.toggle-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-deep);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.toggle-field.active {
+  border-color: var(--accent, #FBBF24);
+  background: rgba(251, 191, 36, 0.06);
+}
+.toggle-field-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+}
+.toggle-field-label .meta {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+.toggle-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border-hi);
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hi));
+}
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+/* LEGAL WARNING for no BOE case */
+.legal-warning {
+  display: none;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(251, 191, 36, 0.04) 100%);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  animation: fadeIn 0.25s ease;
+}
+.legal-warning.visible { display: block; }
+.legal-warning strong {
+  color: var(--warn);
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Hide field when "no boe" is active */
+.field.boe-only.hidden { display: none; }
+
 button.secondary {
   font-family: inherit;
   font-size: 0.82rem;
@@ -775,7 +871,28 @@ button.secondary:hover {
         <div class="field-hint">La distinción coche/moto cambia las cuotas fijas en C. Valenciana.</div>
       </div>
 
-      <div class="field">
+      <div class="toggle-field" id="toggle-no-boe-wrapper">
+        <label class="toggle-field-label" for="noBoe">
+          Vehículo NO figura en el BOE
+          <span class="meta">Coches descatalogados, importados o no listados</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="noBoe">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="legal-warning" id="warning-no-boe">
+        <strong>⚠️ Aviso importante</strong>
+        Cuando el vehículo no figura en las tablas del BOE, la base imponible es directamente el <strong style="color:var(--text);display:inline;text-transform:none;letter-spacing:0;font-size:inherit;margin:0;">precio del contrato de compraventa</strong>. Para evitar problemas con Hacienda, conserva siempre:
+        <ul style="margin:8px 0 0 18px; padding:0; list-style: disc; color: var(--text-muted);">
+          <li>Contrato de compraventa firmado con precio claro</li>
+          <li>Captura/justificante de búsqueda en el BOE confirmando que el vehículo no aparece</li>
+          <li>Ficha técnica del vehículo</li>
+        </ul>
+      </div>
+
+      <div class="field boe-only" id="field-precio">
         <label class="field-label" for="precio">Precio Anexo I (€)</label>
         <input type="number" id="precio" step="100" placeholder="25000" inputmode="decimal">
         <button class="help-toggle" type="button" onclick="toggleHelp('help-precio')">¿Cómo lo encuentro? ▾</button>
@@ -1206,6 +1323,7 @@ function calcularTipoNormal(ccaaParam, etiqueta, cvf, base) {
 
 function calcular() {
   const tipo = document.getElementById('tipo').value;
+  const noBoe = document.getElementById('noBoe').checked;
   const precio = parseFloat(document.getElementById('precio').value) || 0;
   const fechaMat = document.getElementById('fechaMat').value;
   const fechaTrans = document.getElementById('fechaTrans').value;
@@ -1222,10 +1340,40 @@ function calcular() {
   const ccaaParam = ccaaData[ccaaName];
 
   document.getElementById('d-anos').textContent = anos === null ? '—' : `${anos} año${anos === 1 ? '' : 's'}`;
-  document.getElementById('d-tramo').textContent = tramo;
-  document.getElementById('d-pct').textContent = pct ? fmtPct(pct[1]) : '—';
-  document.getElementById('d-uso').textContent = usoEsp ? '70% (uso especial)' : '100%';
+  document.getElementById('d-tramo').textContent = noBoe ? 'No aplica (sin BOE)' : tramo;
+  document.getElementById('d-pct').textContent = noBoe ? '—' : (pct ? fmtPct(pct[1]) : '—');
+  document.getElementById('d-uso').textContent = noBoe ? '—' : (usoEsp ? '70% (uso especial)' : '100%');
 
+  // ===== MODO NO BOE =====
+  // Base imponible = precio contrato directamente. Sin depreciación. Aplica % CCAA estricto.
+  if (noBoe) {
+    if (!precioContrato || !ccaaParam) {
+      document.getElementById('r-valor').textContent = '— €';
+      document.getElementById('r-itp').textContent = '— €';
+      document.getElementById('r-valor-meta').textContent = 'Sin BOE · Falta precio contrato';
+      document.getElementById('r-itp-meta').textContent = '—';
+      document.getElementById('d-tipo').textContent = '—';
+      document.getElementById('d-base').textContent = '—';
+      document.getElementById('resumen').className = 'summary-msg warn';
+      document.getElementById('resumen').textContent = '⚠️ Modo "Sin BOE" activado: introduce el precio del contrato y la CCAA del comprador.';
+      return;
+    }
+    // Aplicar tipo general estricto de la CCAA (sin excepciones, sin etiqueta DGT, sin >15 CVf)
+    const tipoEstricto = ccaaParam.tg;
+    const itpNoBoe = precioContrato * tipoEstricto;
+
+    document.getElementById('r-valor').textContent = '— €';
+    document.getElementById('r-valor-meta').textContent = 'No aplica (vehículo sin BOE)';
+    document.getElementById('r-itp').textContent = fmt(itpNoBoe);
+    document.getElementById('r-itp-meta').textContent = `Sobre precio contrato · ${fmtPct(tipoEstricto)}`;
+    document.getElementById('d-tipo').textContent = fmtPct(tipoEstricto) + ' (estricto)';
+    document.getElementById('d-base').textContent = fmt(precioContrato) + ' (precio contrato · sin BOE)';
+    document.getElementById('resumen').className = 'summary-msg warn';
+    document.getElementById('resumen').textContent = `✓ Sin BOE · ${ccaaName}: ${fmt(precioContrato)} × ${fmtPct(tipoEstricto)} = ${fmt(itpNoBoe)}. Recuerda documentar la ausencia del vehículo en el BOE.`;
+    return;
+  }
+
+  // ===== MODO BOE NORMAL =====
   if (!precio || anos === null || !pct || !ccaaParam) {
     document.getElementById('r-valor').textContent = '— €';
     document.getElementById('r-itp').textContent = '— €';
@@ -1417,6 +1565,8 @@ function resetForm() {
   document.getElementById('etiqueta').value = 'ninguna';
   document.getElementById('usoEspecial').value = 'no';
   document.getElementById('tipo').value = 'turismo-coche';
+  document.getElementById('noBoe').checked = false;
+  applyNoBoeToggle();
   calcular();
 }
 
@@ -1424,11 +1574,34 @@ function setDefaults() {
   document.getElementById('fechaTrans').value = new Date().toISOString().split('T')[0];
 }
 
+function applyNoBoeToggle() {
+  const checked = document.getElementById('noBoe').checked;
+  const wrapper = document.getElementById('toggle-no-boe-wrapper');
+  const warning = document.getElementById('warning-no-boe');
+  const fieldPrecio = document.getElementById('field-precio');
+
+  if (checked) {
+    wrapper.classList.add('active');
+    warning.classList.add('visible');
+    fieldPrecio.classList.add('hidden');
+    document.getElementById('precio').value = '';
+  } else {
+    wrapper.classList.remove('active');
+    warning.classList.remove('visible');
+    fieldPrecio.classList.remove('hidden');
+  }
+}
+
 function bindInputs() {
   ['tipo', 'precio', 'fechaMat', 'fechaTrans', 'cilindrada', 'cvf',
    'etiqueta', 'usoEspecial', 'ccaa', 'precioContrato'].forEach(id => {
     document.getElementById(id).addEventListener('input', calcular);
     document.getElementById(id).addEventListener('change', calcular);
+  });
+  // No BOE toggle gets special treatment: change UI + recalc
+  document.getElementById('noBoe').addEventListener('change', () => {
+    applyNoBoeToggle();
+    calcular();
   });
 }
 
@@ -1444,6 +1617,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
   setDefaults();
   bindInputs();
+  applyNoBoeToggle();
   calcular();
 });
 </script>
