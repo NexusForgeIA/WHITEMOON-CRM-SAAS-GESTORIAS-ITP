@@ -559,6 +559,78 @@ td.amount {
 
 td { color: var(--text-soft); }
 
+/* COLLAPSIBLE TABLES (accordion) */
+details.tbl-collapse {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+details.tbl-collapse[open] {
+  border-color: var(--border-hi);
+}
+details.tbl-collapse summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+details.tbl-collapse summary::-webkit-details-marker { display: none; }
+details.tbl-collapse summary:hover {
+  background: var(--bg-card-hi);
+  color: var(--primary-hi);
+}
+details.tbl-collapse summary .summary-meta {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: auto;
+  margin-right: 12px;
+}
+details.tbl-collapse summary .chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+  color: var(--primary-hi);
+}
+details.tbl-collapse[open] summary .chevron {
+  transform: rotate(180deg);
+}
+details.tbl-collapse table {
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid var(--border);
+}
+details.tbl-collapse .table-intro {
+  padding: 12px 18px 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+details.tbl-collapse[open] .table-intro + table {
+  border-top: none;
+}
+@media (max-width: 600px) {
+  details.tbl-collapse summary {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+  details.tbl-collapse summary .summary-meta {
+    display: none;
+  }
+}
+
 footer {
   margin-top: 56px;
   padding: 32px 24px 24px;
@@ -820,56 +892,105 @@ button.secondary:hover {
     </div>
 
     <div class="tab-panel active" id="tab-motos-comb">
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Precio inicial según cilindrada. A este valor se le aplica la depreciación del Anexo IV.</p>
-      <table>
-        <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
-        <tbody id="tbl-motos-comb"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>📋 Tabla precios motos combustión</span>
+          <span class="summary-meta">13 tramos · cilindrada</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="table-intro">Precio inicial según cilindrada. A este valor se le aplica la depreciación del Anexo IV.</div>
+        <table>
+          <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
+          <tbody id="tbl-motos-comb"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-motos-elec">
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Para motos eléctricas se usa potencia (kW) en lugar de cilindrada.</p>
-      <table>
-        <thead><tr><th>Potencia (kW / cv)</th><th style="text-align:right;">Precio (€)</th></tr></thead>
-        <tbody id="tbl-motos-elec"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>⚡ Tabla precios motos eléctricas</span>
+          <span class="summary-meta">14 tramos · kW</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="table-intro">Para motos eléctricas se usa potencia (kW) en lugar de cilindrada.</div>
+        <table>
+          <thead><tr><th>Potencia (kW / cv)</th><th style="text-align:right;">Precio (€)</th></tr></thead>
+          <tbody id="tbl-motos-elec"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-quads">
-      <table>
-        <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
-        <tbody id="tbl-quads"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>🛺 Tabla precios quads</span>
+          <span class="summary-meta">12 tramos · cilindrada</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <table>
+          <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
+          <tbody id="tbl-quads"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-buggys">
-      <table>
-        <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
-        <tbody id="tbl-buggys"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>🏎️ Tabla precios buggys</span>
+          <span class="summary-meta">6 tramos · cilindrada</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <table>
+          <thead><tr><th>Cilindrada</th><th style="text-align:right;">Precio (€)</th></tr></thead>
+          <tbody id="tbl-buggys"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-cuotas-val">
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Sustituye al cálculo porcentual cuando aplica. Condiciones: valor &lt; 20.000€ y no histórico.</p>
-      <table>
-        <thead><tr><th>Tipo</th><th>Antigüedad</th><th>Cilindrada</th><th style="text-align:right;">Cuota</th></tr></thead>
-        <tbody id="tbl-cuotas-val"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>🏛️ Cuotas fijas C. Valenciana</span>
+          <span class="summary-meta">14 casos · motos + coches</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="table-intro">Sustituye al cálculo porcentual cuando aplica. Condiciones: valor &lt; 20.000€ y no histórico.</div>
+        <table>
+          <thead><tr><th>Tipo</th><th>Antigüedad</th><th>Cilindrada</th><th style="text-align:right;">Cuota</th></tr></thead>
+          <tbody id="tbl-cuotas-val"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-cuotas-otras">
-      <table>
-        <thead><tr><th>CCAA</th><th>Antigüedad</th><th>Cilindrada</th><th style="text-align:right;">Cuota</th></tr></thead>
-        <tbody id="tbl-cuotas-otras"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>🗺️ Cuotas fijas otras CCAA</span>
+          <span class="summary-meta">Aragón · Cantabria · Canarias · Galicia · Murcia</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <table>
+          <thead><tr><th>CCAA</th><th>Antigüedad</th><th>Cilindrada</th><th style="text-align:right;">Cuota</th></tr></thead>
+          <tbody id="tbl-cuotas-otras"></tbody>
+        </table>
+      </details>
     </div>
 
     <div class="tab-panel" id="tab-depreciacion">
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px;">Anexo IV del BOE: porcentajes según años de uso y tipo de vehículo.</p>
-      <table>
-        <thead><tr><th>Años uso</th><th style="text-align:right;">Turismos</th><th style="text-align:right;">Autocaravanas</th><th style="text-align:right;">Embarcaciones</th><th style="text-align:right;">Motores marinos</th></tr></thead>
-        <tbody id="tbl-depreciacion"></tbody>
-      </table>
+      <details class="tbl-collapse">
+        <summary>
+          <span>📉 Tabla depreciación BOE (Anexo IV)</span>
+          <span class="summary-meta">21 tramos · 4 tipos vehículo</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="table-intro">Anexo IV del BOE: porcentajes según años de uso y tipo de vehículo.</div>
+        <table>
+          <thead><tr><th>Años uso</th><th style="text-align:right;">Turismos</th><th style="text-align:right;">Autocaravanas</th><th style="text-align:right;">Embarcaciones</th><th style="text-align:right;">Motores marinos</th></tr></thead>
+          <tbody id="tbl-depreciacion"></tbody>
+        </table>
+      </details>
     </div>
   </section>
 </main>
